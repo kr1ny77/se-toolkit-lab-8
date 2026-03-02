@@ -52,6 +52,14 @@ Title: `[Task] Back-end Testing`
 
 ### 1.3. Part A: Run unit tests locally
 
+<!-- no toc -->
+- [1.3.1. Create the `.env.secret` file](#131-create-the-envsecret-file)
+- [1.3.2. Run existing unit tests](#132-run-existing-unit-tests)
+- [1.3.3. Add a new unit test](#133-add-a-new-unit-test)
+- [1.3.4. Fix the bug](#134-fix-the-bug)
+- [1.3.5. Rerun unit tests](#135-rerun-unit-tests)
+- [1.3.6. Commit the fix](#136-commit-the-fix)
+
 > [!NOTE]
 > Unit tests do not require a running server. They test individual functions in isolation.
 
@@ -186,8 +194,16 @@ Title: `[Task] Back-end Testing`
 
 ### 1.4. Part B: Run end-to-end tests remotely
 
+<!-- no toc -->
+- [1.4.1. Redeploy the fixed version](#141-redeploy-the-fixed-version)
+- [1.4.2. Run existing end-to-end tests](#142-run-existing-end-to-end-tests)
+- [1.4.3. Add two end-to-end tests](#143-add-two-end-to-end-tests)
+- [1.4.4. Fix the bug](#144-fix-the-bug)
+- [1.4.5. Redeploy and rerun](#145-redeploy-and-rerun)
+- [1.4.6. Commit the fix](#146-commit-the-fix)
+
 > [!NOTE]
-> End-to-end tests run on your local machine and send real [`HTTP`](../../../wiki/http.md) requests to the deployed version on the VM.
+> End-to-end tests run on your local machine and send real [`HTTP`](../../../wiki/http.md#what-is-http) requests to the deployed version on the VM.
 
 #### 1.4.1. Redeploy the fixed version
 
@@ -195,7 +211,7 @@ Title: `[Task] Back-end Testing`
 
 #### 1.4.2. Run existing end-to-end tests
 
-1. Set the required environment variables in the terminal. Complete the following steps:
+1. Set the required environment variables in the terminal. Complete these steps:
 
    1. To set the base URL of your deployed API,
 
@@ -212,11 +228,14 @@ Title: `[Task] Back-end Testing`
 
    2. To set the API key,
 
+      <!-- TODO use value from .env.docker.secret -->
+
       [run in the `VS Code Terminal`](../../../wiki/vs-code.md#run-a-command-in-the-vs-code-terminal):
 
       ```terminal
       export API_KEY=<your-api-key>
       ```
+      <!-- TODO link to section about API_KEY -->
 
       Replace `<your-api-key>` with the same value as in your `.env.secret` file.
 
@@ -324,6 +343,12 @@ Title: `[Task] Back-end Testing`
 
 3. All end-to-end tests should pass.
 
+   The output should be similar to this:
+
+   ```terminal
+   ===================== 4 passed in X.XXs =====================
+   ```
+
 #### 1.4.6. Commit the fix
 
 1. [Commit](../../../wiki/git-workflow.md#commit) your changes.
@@ -338,6 +363,12 @@ Title: `[Task] Back-end Testing`
 > Each fix must be a **separate commit**. Do not combine the Part A and Part B fixes into one commit.
 
 ### 1.5. Part C: Generate tests with an AI agent
+
+<!-- no toc -->
+- [1.5.1. Generate tests](#151-generate-tests)
+- [1.5.2. Review and curate the tests](#152-review-and-curate-the-tests)
+- [1.5.3. Run the full test suite](#153-run-the-full-test-suite)
+- [1.5.4. Commit the curated tests](#154-commit-the-curated-tests)
 
 #### 1.5.1. Generate tests
 
