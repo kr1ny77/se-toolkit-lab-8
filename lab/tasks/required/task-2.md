@@ -506,24 +506,28 @@ Title: `[Task] Back-end Testing`
 
 #### 1.5.1. Generate tests
 
-1. Open the [coding agent](../../../wiki/coding-agents.md#what-is-a-coding-agent) in the back-end project directory.
+1. Open the [coding agent](../../../wiki/coding-agents.md#what-is-a-coding-agent).
+
 2. Give it this prompt:
 
-   > "Read the back-end source code and the existing unit tests. Generate five new unit tests that cover edge cases and boundary values not already tested."
+   > "Read the back-end source code under `backend/` and the existing unit tests in `backend/tests/unit/test_interactions.py`. Generate five new unit tests that cover edge cases and boundary values not already tested. Write them to a new file `backend/tests/unit/test_interactions_ai.py`."
 
 3. Wait for the agent to generate the tests.
 
 #### 1.5.2. Review and curate the tests
 
-1. Review each generated test against the following criteria:
+1. [Open the file](../../../wiki/vs-code.md#open-the-file):
+   [`backend/tests/unit/test_interactions_ai.py`](../../../backend/tests/unit/test_interactions_ai.py).
+
+2. Review each generated test against the following criteria:
 
    - **Keep** — the test is correct, targets a real case, and adds coverage not already present.
    - **Fix** — the test has a minor error (wrong assertion, wrong expected value) but the idea is sound — correct it.
    - **Discard** — the test duplicates an existing test, is logically wrong, or tests behaviour outside the scope of the module.
 
-2. Keep at least two tests and discard at least one.
+3. Keep at least two tests and discard at least one.
 
-3. For each generated test, add a one-line comment that documents your decision and reason:
+4. For each generated test, add a one-line comment that documents your decision and reason:
    - For a kept or fixed test: `# KEPT: <reason>` or `# FIXED: <reason>`
    - For a discarded test: paste it commented out with `# DISCARDED: <reason>` above it
 
