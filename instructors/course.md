@@ -31,8 +31,14 @@ Each lab is 3 hours long.
 
 The course offers:
 
-- A solid working setup for a web development project using AI (see AI skills).
+- A solid working setup for a web development project using AI agents and agent skills.
 - A wiki that:
   - connects the dots between many software engineering concepts.
-  - can be a reliable source of truth for generating instructions.
-- A setup for generating and curating the materials for new labs using AI "skills".
+  - can be a reliable source of truth for generating instructions for tasks.
+- A setup for generating and curating the materials for new labs using agent skills.
+- An example of managing context, complexity, and quality using AI.
+- Step-by-step instructions for those who want to follow and not to outsource all work to the agent.
+- A setup that:
+  - supports Windows, Linux, macOS on the student's computer
+  - can work with any Linux-based VM with particular pre-installed software
+  - uses GitHub but mostly none of its specific features that aren't available on other platforms
