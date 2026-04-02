@@ -49,11 +49,68 @@ Alternatively, if there's a specific tool or command I should run to query the L
 
 ## Task 1B — Agent with LMS tools
 
-<!-- Paste the agent's response to "What labs are available?" and "Describe the architecture of the LMS system" -->
+**Test command:** `uv run nanobot agent --logs --session cli:task1b-labs -c ./config.json -m "What labs are available?"`
+
+**Response to "What labs are available?":**
+
+```
+Here are the available labs:
+
+1. Lab 01 – Products, Architecture & Roles
+2. Lab 02 — Run, Fix, and Deploy a Backend Service
+3. Lab 03 — Backend API: Explore, Debug, Implement, Deploy
+4. Lab 04 — Testing, Front-end, and AI Agents
+5. Lab 05 — Data Pipeline and Analytics Dashboard
+6. Lab 06 — Build Your Own Agent
+7. Lab 07 — Build a Client with an AI Coding Agent
+8. lab-08
+
+Would you like more details about any specific lab, such as pass rates, completion stats, or top learners?
+```
+
+**Test command:** `uv run nanobot agent --logs --session cli:task1b-health -c ./config.json -m "Is the LMS backend healthy?"`
+
+**Response to "Is the LMS backend healthy?":**
+
+```
+Yes, the LMS backend is healthy! ✅
+
+- Status: Healthy
+- Item count: 56 items
+- Errors: None
+```
+
+**Observation:** The agent now has access to real LMS backend data via MCP tools. It successfully called `mcp_lms_lms_labs` and `mcp_lms_lms_health` to retrieve live data from the backend.
 
 ## Task 1C — Skill prompt
 
-<!-- Paste the agent's response to "Show me the scores" (without specifying a lab) -->
+**Test command:** `uv run nanobot agent --logs --session cli:task1c-scores -c ./config.json -m "Show me the scores"`
+
+**Response to "Show me the scores" (without specifying a lab):**
+
+```
+I'll help you view the scores. First, let me check what labs are available in the LMS.
+
+Here are the available labs:
+
+1. Lab 01 – Products, Architecture & Roles
+2. Lab 02 — Run, Fix, and Deploy a Backend Service
+3. Lab 03 — Backend API: Explore, Debug, Implement, Deploy
+4. Lab 04 — Testing, Front-end, and AI Agents
+5. Lab 05 — Data Pipeline and Analytics Dashboard
+6. Lab 06 — Build Your Own Agent
+7. Lab 07 — Build a Client with an AI Coding Agent
+8. Lab 08 — lab-08
+
+Which lab would you like to see the scores for?
+```
+
+**Observation:** The skill prompt successfully teaches the agent to:
+1. Recognize when a lab parameter is needed but not provided
+2. Call `mcp_lms_lms_labs` first to get available labs
+3. Present the list and ask the user to choose
+
+**Skill file created:** `nanobot/workspace/skills/lms/SKILL.md`
 
 ## Task 2A — Deployed agent
 
