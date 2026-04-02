@@ -4,7 +4,48 @@ Paste your checkpoint evidence below. Add screenshots as image files in the repo
 
 ## Task 1A — Bare agent
 
-<!-- Paste the agent's response to "What is the agentic loop?" and "What labs are available in our LMS?" -->
+**Test command:** `uv run nanobot agent --logs --session cli:task1a-loop -c ./config.json -m "What is the agentic loop?"`
+
+**Response to "What is the agentic loop?":**
+
+```
+The agentic loop is the fundamental cycle that autonomous AI agents follow to accomplish tasks. It typically consists of these core stages:
+
+1. Perceive — Gather information from the environment (user input, tool outputs, file contents, API responses, etc.)
+2. Reason — Process the information, plan next steps, and make decisions about what actions to take
+3. Act — Execute actions using available tools (reading/writing files, running commands, making API calls, sending messages, etc.)
+4. Observe — Collect feedback from the actions taken (success/failure, outputs, errors)
+5. Repeat — Continue the loop until the goal is achieved or a stopping condition is met
+
+This loop enables agents to:
+- Break complex tasks into smaller steps
+- Adapt based on feedback and errors
+- Use tools autonomously
+- Self-correct when things go wrong
+
+The quality of an agent depends on how well it executes each stage—especially the reasoning step, which determines whether actions are purposeful and efficient.
+```
+
+**Test command:** `uv run nanobot agent --logs --session cli:task1a-labs -c ./config.json -m "What labs are available in our LMS?"`
+
+**Response to "What labs are available in our LMS?":**
+
+```
+I see the workspace is set up but doesn't contain specific LMS information yet. Based on the path /home/autochecker/se-toolkit-lab-8/, it appears you're working with a software engineering toolkit for lab 8.
+
+To find out what labs are available in your LMS, I would need to know:
+1. Which LMS platform you're using (e.g., Canvas, Moodle, Blackboard, Brightspace, etc.)
+2. How to access it - Is there an API, a local configuration file, or a specific command/tool I should use?
+
+Could you provide more details about:
+- What LMS platform your course uses?
+- Is there a configuration file or script in the workspace that connects to the LMS?
+- Are there any environment variables or credentials already set up for LMS access?
+
+Alternatively, if there's a specific tool or command I should run to query the LMS, please let me know!
+```
+
+**Observation:** The bare agent answers general questions correctly but has no access to real LMS backend data. It can only inspect local files and provide general knowledge.
 
 ## Task 1B — Agent with LMS tools
 
