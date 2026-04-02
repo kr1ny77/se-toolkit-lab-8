@@ -114,7 +114,31 @@ Which lab would you like to see the scores for?
 
 ## Task 2A — Deployed agent
 
-<!-- Paste a short nanobot startup log excerpt showing the gateway started inside Docker -->
+**Nanobot gateway startup log:**
+
+```
+🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
+WebChat channel enabled
+✓ Channels enabled: webchat
+✓ Heartbeat: every 1800s
+Cron service started with 0 jobs
+Heartbeat started (every 1800s)
+Starting webchat channel...
+Outbound dispatcher started
+MCP: registered tool 'mcp_lms_lms_health' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_labs' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_learners' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_pass_rates' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_timeline' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_groups' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_top_learners' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_completion_rate' from server 'lms'
+MCP: registered tool 'mcp_lms_lms_sync_pipeline' from server 'lms'
+MCP server 'lms': connected, 9 tools registered
+Agent loop started
+```
+
+**Observation:** The nanobot gateway is running as a Docker service with the webchat channel enabled and all 9 LMS MCP tools connected.
 
 ## Task 2B — Web client
 

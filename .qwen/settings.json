@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(sleep *)",
+      "Bash(do *)",
+      "Bash(break)",
+      "Bash(done)"
+    ]
+  },
+  "$version": 3
+}
