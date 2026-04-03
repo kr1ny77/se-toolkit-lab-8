@@ -142,7 +142,34 @@ Agent loop started
 
 ## Task 2B — Web client
 
-<!-- Screenshot of a conversation with the agent in the Flutter web app -->
+**Flutter web client accessible at `/flutter`:**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/flutter/">
+  <meta charset="UTF-8">
+  <title>Nanobot</title>
+  ...
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>
+```
+
+**Nanobot gateway startup logs:**
+```
+🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
+✓ Channels enabled: webchat
+Starting webchat channel...
+Agent loop started
+MCP server 'lms': connected, 9 tools registered
+```
+
+**WebSocket endpoint:** `ws://localhost:42002/ws/chat?access_key=nanobot-access-key-123`
+
+**Observation:** The Flutter web client is accessible at `/flutter` and the nanobot gateway is running with the webchat channel enabled. The agent has 9 LMS MCP tools connected and the agent loop is running.
 
 ## Task 3A — Structured logging
 
