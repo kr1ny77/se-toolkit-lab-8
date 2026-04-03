@@ -118,24 +118,10 @@ Which lab would you like to see the scores for?
 
 ```
 🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
-WebChat channel enabled
 ✓ Channels enabled: webchat
-✓ Heartbeat: every 1800s
-Cron service started with 0 jobs
-Heartbeat started (every 1800s)
 Starting webchat channel...
-Outbound dispatcher started
-MCP: registered tool 'mcp_lms_lms_health' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_labs' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_learners' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_pass_rates' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_timeline' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_groups' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_top_learners' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_completion_rate' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_sync_pipeline' from server 'lms'
-MCP server 'lms': connected, 9 tools registered
 Agent loop started
+MCP server 'lms': connected, 9 tools registered
 ```
 
 **Observation:** The nanobot gateway is running as a Docker service with the webchat channel enabled and all 9 LMS MCP tools connected.
@@ -143,33 +129,32 @@ Agent loop started
 ## Task 2B — Web client
 
 **Flutter web client accessible at `/flutter`:**
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <base href="/flutter/">
-  <meta charset="UTF-8">
-  <title>Nanobot</title>
-  ...
-</head>
-<body>
-  <div id="root"></div>
-</body>
-</html>
+The Flutter client is accessible at `http://<vm-ip>:42002/flutter` and serves a compiled web app.
+
+**WebSocket endpoint test:**
+```terminal
+$ echo '{"content":"What labs are available?"}' | websocat "ws://localhost:42002/ws/chat?access_key=nanobot-access-key-123"
+RESPONSE: {"type":"text","content":"I can help you check what labs are available in the Learning Management System. Let me fetch that information for you.","format":"markdown"}
 ```
 
-**Nanobot gateway startup logs:**
+**Nanobot gateway logs showing successful LMS query:**
 ```
-🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
-✓ Channels enabled: webchat
-Starting webchat channel...
-Agent loop started
-MCP server 'lms': connected, 9 tools registered
+2026-04-03 08:26:20.343 | INFO | Processing message from webchat:...: What labs are available?
+2026-04-03 08:26:23.846 | INFO | Tool call: mcp_lms_lms_labs({})
+2026-04-03 08:26:34.472 | INFO | Response to webchat:...: Here are the available labs in the Learning Management System:
+
+1. Lab 01 – Products, Architecture & Roles
+2. Lab 02 — Run, Fix, and Deploy a Backend Service
+3. Lab 03 — Backend API: Explore, Debug, Implement, Deploy
+...
 ```
 
-**WebSocket endpoint:** `ws://localhost:42002/ws/chat?access_key=nanobot-access-key-123`
+**Qwen API status:**
+- Health check: `{"status":"ok","default_account":{"status":"healthy"}}`
+- LLM calls successful - agent is responding to queries with real LMS data
+- OAuth token valid and being used for DashScope API calls
 
-**Observation:** The Flutter web client is accessible at `/flutter` and the nanobot gateway is running with the webchat channel enabled. The agent has 9 LMS MCP tools connected and the agent loop is running.
+**Observation:** The Flutter web client is accessible at `/flutter` and the nanobot gateway is running with the webchat channel enabled. The agent has 9 LMS MCP tools connected and successfully responds to queries. The WebSocket endpoint at `/ws/chat` is working correctly with the access key authentication.
 
 ## Task 3A — Structured logging
 
