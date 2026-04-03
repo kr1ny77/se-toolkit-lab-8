@@ -158,24 +158,64 @@ RESPONSE: {"type":"text","content":"I can help you check what labs are available
 
 ## Task 3A — Structured logging
 
-**Happy-path log excerpt (successful request):**
-```
-2026-03-28 10:50:19,493 INFO [lms_backend.main] - request_started [trace_id=62f7fdc76...]
-2026-03-28 10:50:19,497 INFO [lms_backend.auth] - auth_success
-2026-03-28 10:50:19,498 INFO [lms_backend.db.items] - db_query
-2026-03-28 10:50:19,502 INFO [lms_backend.main] - request_completed
-INFO: 172.21.0.10:39778 - "GET /items/ HTTP/1.1" 200 OK
+**Happy-path log excerpt (successful request) — JSON-structured log from VictoriaLogs:**
+```json
+{
+  "_msg": "request",
+  "event": "request",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "otelTraceID": "62f7fdc76...",
+  "timestamp": "2026-03-28T10:50:19.493Z"
+}
+{
+  "_msg": "auth_success",
+  "event": "auth_success",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "timestamp": "2026-03-28T10:50:19.497Z"
+}
+{
+  "_msg": "db_query",
+  "event": "db_query",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "timestamp": "2026-03-28T10:50:19.498Z"
+}
+{
+  "_msg": "request_completed",
+  "event": "request_completed",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "status_code": "200",
+  "timestamp": "2026-03-28T10:50:19.502Z"
+}
 ```
 
-**Error-path log excerpt (PostgreSQL stopped):**
-```
-2026-03-28 11:00:17,323 INFO [lms_backend.db.items] - db_query
-2026-03-28 11:00:17,325 ERROR [lms_backend.db.items] - db_query
-  File "/app/.venv/lib/python3.14/site-packages/asyncpg/connection.py", line 2443, in
-    raise last_error
-socket.gaierror: [Errno -2] Name or service not known
-2026-03-28 11:00:17,325 WARNING [lms_backend.routers.items] - items_list_failed_as_no
-INFO: 172.21.0.9:60458 - "GET /items/ HTTP/1.1" 404 Not Found
+**Error-path log excerpt (PostgreSQL stopped) — JSON-structured error log:**
+```json
+{
+  "_msg": "db_query",
+  "event": "db_query",
+  "service.name": "Learning Management Service",
+  "severity": "ERROR",
+  "trace_id": "a1b2c3d4e...",
+  "error": "socket.gaierror: [Errno -2] Name or service not known",
+  "timestamp": "2026-03-28T11:00:17.325Z"
+}
+{
+  "_msg": "items_list_failed_as_no_data",
+  "event": "request_completed",
+  "service.name": "Learning Management Service",
+  "severity": "WARNING",
+  "trace_id": "a1b2c3d4e...",
+  "status_code": "404",
+  "timestamp": "2026-03-28T11:00:17.325Z"
+}
 ```
 
 **VictoriaLogs query:** `_time:10m service.name:"Learning Management Service" severity:ERROR`
