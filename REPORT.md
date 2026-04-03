@@ -233,15 +233,35 @@ Traces are available at `http://<vm-ip>:42002/utils/victoriatraces`.
 
 **Question:** "Any LMS backend errors in the last 10 minutes?" (normal conditions)
 
-**Agent response:** "I'll check for LMS backend errors in the last 10 minutes."
+**Agent response:**
+```
+I'll check for LMS backend errors in the last 10 minutes.
 
-The agent called:
-1. `mcp_observability_logs_error_count` with minutes=10, service="Learning Management Service"
-2. `mcp_observability_logs_search` with LogsQL query
+Found 0 error-level log entries for service "Learning Management Service" in the last 10 minutes.
+
+No errors found in the LMS backend logs in the last 10 minutes. The system appears healthy.
+```
+
+**Tool calls made:**
+1. `mcp_observability_logs_error_count(service="Learning Management Service", minutes=10)` → `Found 0 error-level log entries...`
+2. `mcp_observability_logs_search(service="Learning Management Service", severity="ERROR", minutes=10)` → `No log entries found...`
 
 **Question:** "Any LMS backend errors in the last 10 minutes?" (with PostgreSQL stopped)
 
-**Agent response:** "Yes, there are 2 errors in the LMS backend in the last 10 minutes. Both are database connectivity issues."
+**Agent response:**
+```
+Yes, there are 2 errors in the LMS backend in the last 10 minutes. Both are database connectivity issues.
+
+Error details:
+- socket.gaierror: [Errno -2] Name or service not known
+- items_list_failed_as_no_data (status 404)
+
+The errors indicate the LMS backend cannot connect to PostgreSQL.
+```
+
+**Tool calls made:**
+1. `mcp_observability_logs_error_count(service="Learning Management Service", minutes=10)` → `Found 2 error-level log entries...`
+2. `mcp_observability_logs_search(service="Learning Management Service", severity="ERROR", minutes=10)` → Returns actual error log entries
 
 The observability MCP server (`mcp/mcp-obs/`) provides four tools:
 - `logs_search` — Search logs using LogsQL query
