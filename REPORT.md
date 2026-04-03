@@ -158,47 +158,56 @@ RESPONSE: {"type":"text","content":"I can help you check what labs are available
 
 ## Task 3A — Structured logging
 
-**Happy-path log excerpt (request_started → request_completed):**
+**Happy-path log excerpt (successful request):**
 ```
-{"level": "info", "service.name": "Learning Management Service", "event": "request_started", "trace_id": "..."}
-{"level": "info", "service.name": "Learning Management Service", "event": "auth_success", "trace_id": "..."}
-{"level": "info", "service.name": "Learning Management Service", "event": "db_query", "trace_id": "..."}
-{"level": "info", "service.name": "Learning Management Service", "event": "request_completed", "status": 200, "trace_id": "..."}
+2026-03-28 10:50:19,493 INFO [lms_backend.main] - request_started [trace_id=62f7fdc76...]
+2026-03-28 10:50:19,497 INFO [lms_backend.auth] - auth_success
+2026-03-28 10:50:19,498 INFO [lms_backend.db.items] - db_query
+2026-03-28 10:50:19,502 INFO [lms_backend.main] - request_completed
+INFO: 172.21.0.10:39778 - "GET /items/ HTTP/1.1" 200 OK
 ```
 
-**Error-path log excerpt (db_query with error):**
+**Error-path log excerpt (PostgreSQL stopped):**
 ```
-{"level": "error", "service.name": "Learning Management Service", "event": "db_query", "error": "connection refused", "trace_id": "..."}
-{"level": "error", "service.name": "Learning Management Service", "event": "request_completed", "status": 500, "trace_id": "..."}
+2026-03-28 11:00:17,323 INFO [lms_backend.db.items] - db_query
+2026-03-28 11:00:17,325 ERROR [lms_backend.db.items] - db_query
+  File "/app/.venv/lib/python3.14/site-packages/asyncpg/connection.py", line 2443, in
+    raise last_error
+socket.gaierror: [Errno -2] Name or service not known
+2026-03-28 11:00:17,325 WARNING [lms_backend.routers.items] - items_list_failed_as_no
+INFO: 172.21.0.9:60458 - "GET /items/ HTTP/1.1" 404 Not Found
 ```
 
 **VictoriaLogs query:** `_time:10m service.name:"Learning Management Service" severity:ERROR`
+Returns error logs filtered by service and severity level.
 
 ## Task 3B — Traces
 
-**Healthy trace:** Shows span hierarchy across backend → database with all spans completing successfully.
+Traces are available at `http://<vm-ip>:42002/utils/victoriatraces`.
 
-**Error trace:** Shows the failing span where PostgreSQL connection was refused, with error status on the db_query span.
+**Healthy trace:** Shows span hierarchy with `request_started` → `auth_success` → `db_query` → `request_completed`
+
+**Error trace:** Shows the failure point at `db_query` with the PostgreSQL connection error propagating through the span hierarchy.
 
 ## Task 3C — Observability MCP tools
 
-**Nanobot logs showing observability tools registered:**
-```
-🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
-✓ Channels enabled: webchat
-MCP: registered tool 'mcp_observability_logs_search' from server 'observability'
-MCP: registered tool 'mcp_observability_logs_error_count' from server 'observability'
-MCP: registered tool 'mcp_observability_traces_list' from server 'observability'
-MCP: registered tool 'mcp_observability_traces_get' from server 'observability'
-MCP server 'observability': connected, 4 tools registered
-Agent loop started
-```
+**Question:** "Any LMS backend errors in the last 10 minutes?" (normal conditions)
 
-**Response to "Any LMS backend errors in the last 10 minutes?" (normal conditions):**
-Agent uses `logs_error_count` and reports no errors found.
+**Agent response:** "I'll check for LMS backend errors in the last 10 minutes."
 
-**Response after stopping PostgreSQL:**
-Agent detects new backend errors and reports them with trace details.
+The agent called:
+1. `mcp_observability_logs_error_count` with minutes=10, service="Learning Management Service"
+2. `mcp_observability_logs_search` with LogsQL query
+
+**Question:** "Any LMS backend errors in the last 10 minutes?" (with PostgreSQL stopped)
+
+**Agent response:** "Yes, there are 2 errors in the LMS backend in the last 10 minutes. Both are database connectivity issues."
+
+The observability MCP server (`mcp/mcp-obs/`) provides four tools:
+- `logs_search` — Search logs using LogsQL query
+- `logs_error_count` — Count errors per service over a time window
+- `traces_list` — List recent traces for a service
+- `traces_get` — Fetch a specific trace by ID
 
 ## Task 4A — Multi-step investigation
 
