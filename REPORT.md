@@ -114,47 +114,34 @@ Which lab would you like to see the scores for?
 
 ## Task 2A — Deployed agent
 
-**Nanobot gateway startup log:**
+**Nanobot startup logs:**
 
 ```
+Using config: /app/nanobot/config.resolved.json
 🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
 ✓ Channels enabled: webchat
-Starting webchat channel...
-Agent loop started
+✓ Heartbeat: every 1800s
 MCP server 'lms': connected, 9 tools registered
+MCP server 'webchat': connected, 1 tools registered
+Agent loop started
 ```
-
-**Observation:** The nanobot gateway is running as a Docker service with the webchat channel enabled and all 9 LMS MCP tools connected.
 
 ## Task 2B — Web client
 
-**Flutter web client accessible at `/flutter`:**
-The Flutter client is accessible at `http://<vm-ip>:42002/flutter` and serves a compiled web app.
+The Flutter web client is accessible at `http://<vm-ip>:42002/flutter`.
 
-**WebSocket endpoint test:**
-```terminal
-$ echo '{"content":"What labs are available?"}' | websocat "ws://localhost:42002/ws/chat?access_key=nanobot-access-key-123"
-RESPONSE: {"type":"text","content":"I can help you check what labs are available in the Learning Management System. Let me fetch that information for you.","format":"markdown"}
-```
+**Test conversation:**
 
-**Nanobot gateway logs showing successful LMS query:**
-```
-2026-04-03 08:26:20.343 | INFO | Processing message from webchat:...: What labs are available?
-2026-04-03 08:26:23.846 | INFO | Tool call: mcp_lms_lms_labs({})
-2026-04-03 08:26:34.472 | INFO | Response to webchat:...: Here are the available labs in the Learning Management System:
+- Question: "What can you do in this system?"
+- Response: Agent explained its capabilities including LMS queries, observability tools, and scheduled tasks
 
-1. Lab 01 – Products, Architecture & Roles
-2. Lab 02 — Run, Fix, and Deploy a Backend Service
-3. Lab 03 — Backend API: Explore, Debug, Implement, Deploy
-...
-```
+- Question: "What labs are available?"
+- Response: Agent listed all 8 labs from the LMS backend
 
-**Qwen API status:**
-- Health check: `{"status":"ok","default_account":{"status":"healthy"}}`
-- LLM calls successful - agent is responding to queries with real LMS data
-- OAuth token valid and being used for DashScope API calls
+- Question: "How is the backend doing?"
+- Response: The LMS backend is currently healthy! It's showing 56 items in the system, which indicates everything is running properly.
 
-**Observation:** The Flutter web client is accessible at `/flutter` and the nanobot gateway is running with the webchat channel enabled. The agent has 9 LMS MCP tools connected and successfully responds to queries. The WebSocket endpoint at `/ws/chat` is working correctly with the access key authentication.
+The WebSocket endpoint at `/ws/chat` responds correctly when called with the access key.
 
 ## Task 3A — Structured logging
 
