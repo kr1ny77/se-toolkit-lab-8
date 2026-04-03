@@ -118,24 +118,10 @@ Which lab would you like to see the scores for?
 
 ```
 🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
-WebChat channel enabled
 ✓ Channels enabled: webchat
-✓ Heartbeat: every 1800s
-Cron service started with 0 jobs
-Heartbeat started (every 1800s)
 Starting webchat channel...
-Outbound dispatcher started
-MCP: registered tool 'mcp_lms_lms_health' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_labs' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_learners' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_pass_rates' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_timeline' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_groups' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_top_learners' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_completion_rate' from server 'lms'
-MCP: registered tool 'mcp_lms_lms_sync_pipeline' from server 'lms'
-MCP server 'lms': connected, 9 tools registered
 Agent loop started
+MCP server 'lms': connected, 9 tools registered
 ```
 
 **Observation:** The nanobot gateway is running as a Docker service with the webchat channel enabled and all 9 LMS MCP tools connected.
@@ -150,7 +136,7 @@ Agent loop started
   <base href="/flutter/">
   <meta charset="UTF-8">
   <title>Nanobot</title>
-  ...
+  <script src="flutter_bootstrap.js" async></script>
 </head>
 <body>
   <div id="root"></div>
@@ -169,7 +155,11 @@ MCP server 'lms': connected, 9 tools registered
 
 **WebSocket endpoint:** `ws://localhost:42002/ws/chat?access_key=nanobot-access-key-123`
 
-**Observation:** The Flutter web client is accessible at `/flutter` and the nanobot gateway is running with the webchat channel enabled. The agent has 9 LMS MCP tools connected and the agent loop is running.
+**Qwen API status:**
+- Health check: `{"status":"ok","default_account":{"status":"healthy"}}`
+- LLM calls return errors due to OAuth free tier limitations (token valid but API access restricted)
+
+**Observation:** The Flutter web client is accessible at `/flutter` and the nanobot gateway is running with the webchat channel enabled. The agent has 9 LMS MCP tools connected and the agent loop is running. The Qwen OAuth free tier provides valid tokens but restricts direct API access, which affects LLM responses.
 
 ## Task 3A — Structured logging
 
