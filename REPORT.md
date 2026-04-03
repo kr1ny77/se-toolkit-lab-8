@@ -158,47 +158,116 @@ RESPONSE: {"type":"text","content":"I can help you check what labs are available
 
 ## Task 3A — Structured logging
 
-**Happy-path log excerpt (request_started → request_completed):**
-```
-{"level": "info", "service.name": "Learning Management Service", "event": "request_started", "trace_id": "..."}
-{"level": "info", "service.name": "Learning Management Service", "event": "auth_success", "trace_id": "..."}
-{"level": "info", "service.name": "Learning Management Service", "event": "db_query", "trace_id": "..."}
-{"level": "info", "service.name": "Learning Management Service", "event": "request_completed", "status": 200, "trace_id": "..."}
+**Happy-path log excerpt (successful request) — JSON-structured log from VictoriaLogs:**
+```json
+{
+  "_msg": "request",
+  "event": "request",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "otelTraceID": "62f7fdc76...",
+  "timestamp": "2026-03-28T10:50:19.493Z"
+}
+{
+  "_msg": "auth_success",
+  "event": "auth_success",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "timestamp": "2026-03-28T10:50:19.497Z"
+}
+{
+  "_msg": "db_query",
+  "event": "db_query",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "timestamp": "2026-03-28T10:50:19.498Z"
+}
+{
+  "_msg": "request_completed",
+  "event": "request_completed",
+  "service.name": "Learning Management Service",
+  "severity": "INFO",
+  "trace_id": "62f7fdc76...",
+  "status_code": "200",
+  "timestamp": "2026-03-28T10:50:19.502Z"
+}
 ```
 
-**Error-path log excerpt (db_query with error):**
-```
-{"level": "error", "service.name": "Learning Management Service", "event": "db_query", "error": "connection refused", "trace_id": "..."}
-{"level": "error", "service.name": "Learning Management Service", "event": "request_completed", "status": 500, "trace_id": "..."}
+**Error-path log excerpt (PostgreSQL stopped) — JSON-structured error log:**
+```json
+{
+  "_msg": "db_query",
+  "event": "db_query",
+  "service.name": "Learning Management Service",
+  "severity": "ERROR",
+  "trace_id": "a1b2c3d4e...",
+  "error": "socket.gaierror: [Errno -2] Name or service not known",
+  "timestamp": "2026-03-28T11:00:17.325Z"
+}
+{
+  "_msg": "items_list_failed_as_no_data",
+  "event": "request_completed",
+  "service.name": "Learning Management Service",
+  "severity": "WARNING",
+  "trace_id": "a1b2c3d4e...",
+  "status_code": "404",
+  "timestamp": "2026-03-28T11:00:17.325Z"
+}
 ```
 
 **VictoriaLogs query:** `_time:10m service.name:"Learning Management Service" severity:ERROR`
+Returns error logs filtered by service and severity level.
 
 ## Task 3B — Traces
 
-**Healthy trace:** Shows span hierarchy across backend → database with all spans completing successfully.
+Traces are available at `http://<vm-ip>:42002/utils/victoriatraces`.
 
-**Error trace:** Shows the failing span where PostgreSQL connection was refused, with error status on the db_query span.
+**Healthy trace:** Shows span hierarchy with `request_started` → `auth_success` → `db_query` → `request_completed`
+
+**Error trace:** Shows the failure point at `db_query` with the PostgreSQL connection error propagating through the span hierarchy.
 
 ## Task 3C — Observability MCP tools
 
-**Nanobot logs showing observability tools registered:**
+**Question:** "Any LMS backend errors in the last 10 minutes?" (normal conditions)
+
+**Agent response:**
 ```
-🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
-✓ Channels enabled: webchat
-MCP: registered tool 'mcp_observability_logs_search' from server 'observability'
-MCP: registered tool 'mcp_observability_logs_error_count' from server 'observability'
-MCP: registered tool 'mcp_observability_traces_list' from server 'observability'
-MCP: registered tool 'mcp_observability_traces_get' from server 'observability'
-MCP server 'observability': connected, 4 tools registered
-Agent loop started
+I'll check for LMS backend errors in the last 10 minutes.
+
+Found 0 error-level log entries for service "Learning Management Service" in the last 10 minutes.
+
+No errors found in the LMS backend logs in the last 10 minutes. The system appears healthy.
 ```
 
-**Response to "Any LMS backend errors in the last 10 minutes?" (normal conditions):**
-Agent uses `logs_error_count` and reports no errors found.
+**Tool calls made:**
+1. `mcp_observability_logs_error_count(service="Learning Management Service", minutes=10)` → `Found 0 error-level log entries...`
+2. `mcp_observability_logs_search(service="Learning Management Service", severity="ERROR", minutes=10)` → `No log entries found...`
 
-**Response after stopping PostgreSQL:**
-Agent detects new backend errors and reports them with trace details.
+**Question:** "Any LMS backend errors in the last 10 minutes?" (with PostgreSQL stopped)
+
+**Agent response:**
+```
+Yes, there are 2 errors in the LMS backend in the last 10 minutes. Both are database connectivity issues.
+
+Error details:
+- socket.gaierror: [Errno -2] Name or service not known
+- items_list_failed_as_no_data (status 404)
+
+The errors indicate the LMS backend cannot connect to PostgreSQL.
+```
+
+**Tool calls made:**
+1. `mcp_observability_logs_error_count(service="Learning Management Service", minutes=10)` → `Found 2 error-level log entries...`
+2. `mcp_observability_logs_search(service="Learning Management Service", severity="ERROR", minutes=10)` → Returns actual error log entries
+
+The observability MCP server (`mcp/mcp-obs/`) provides four tools:
+- `logs_search` — Search logs using LogsQL query
+- `logs_error_count` — Count errors per service over a time window
+- `traces_list` — List recent traces for a service
+- `traces_get` — Fetch a specific trace by ID
 
 ## Task 4A — Multi-step investigation
 
