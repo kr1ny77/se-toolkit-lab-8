@@ -16,15 +16,16 @@ def install_mcp_deps():
     """Install MCP dependencies from mounted volumes."""
     import shutil
     import tempfile
-    
+
     mcp_lms = Path("/app/mcp/mcp-lms")
     mcp_webchat = Path("/app/nanobot-websocket-channel/mcp-webchat")
+    mcp_obs = Path("/app/mcp/mcp-obs")
     nanobot_webchat = Path("/app/nanobot-websocket-channel/nanobot-webchat")
     nanobot_channel_protocol = Path("/app/nanobot-websocket-channel/nanobot-channel-protocol")
-    
+
     # Copy to temp directory to avoid timestamp issues with mounted volumes
     tmpdir = Path(tempfile.mkdtemp())
-    
+
     # Install in dependency order
     if nanobot_channel_protocol.exists():
         dst = tmpdir / "nanobot-channel-protocol"
@@ -33,6 +34,10 @@ def install_mcp_deps():
     if mcp_lms.exists():
         dst = tmpdir / "mcp-lms"
         shutil.copytree(mcp_lms, dst)
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-cache-dir", str(dst)])
+    if mcp_obs.exists():
+        dst = tmpdir / "mcp-obs"
+        shutil.copytree(mcp_obs, dst)
         subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-cache-dir", str(dst)])
     if nanobot_webchat.exists():
         dst = tmpdir / "nanobot-webchat"
@@ -43,7 +48,7 @@ def install_mcp_deps():
         dst = tmpdir / "mcp-webchat"
         shutil.copytree(mcp_webchat, dst)
         subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-cache-dir", "--no-deps", str(dst)])
-    
+
     # Cleanup
     shutil.rmtree(tmpdir)
 
@@ -126,6 +131,19 @@ def main():
             env["NANOBOT_WEBCHAT_MCP_TOKEN"] = os.environ["NANOBOT_WEBCHAT_MCP_TOKEN"]
         if env:
             config["tools"]["mcpServers"]["webchat"]["env"] = env
+
+    # Observability MCP server
+    config["tools"]["mcpServers"]["observability"] = {
+        "command": "python",
+        "args": ["-m", "mcp_obs"],
+    }
+    obs_env = {}
+    if "NANOBOT_VICTORIALOGS_URL" in os.environ:
+        obs_env["NANOBOT_VICTORIALOGS_URL"] = os.environ["NANOBOT_VICTORIALOGS_URL"]
+    if "NANOBOT_VICTORIATRACES_URL" in os.environ:
+        obs_env["NANOBOT_VICTORIATRACES_URL"] = os.environ["NANOBOT_VICTORIATRACES_URL"]
+    if obs_env:
+        config["tools"]["mcpServers"]["observability"]["env"] = obs_env
 
     # Write resolved config
     with open(resolved_file, "w") as f:

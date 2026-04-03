@@ -158,15 +158,47 @@ RESPONSE: {"type":"text","content":"I can help you check what labs are available
 
 ## Task 3A — Structured logging
 
-<!-- Paste happy-path and error-path log excerpts, VictoriaLogs query screenshot -->
+**Happy-path log excerpt (request_started → request_completed):**
+```
+{"level": "info", "service.name": "Learning Management Service", "event": "request_started", "trace_id": "..."}
+{"level": "info", "service.name": "Learning Management Service", "event": "auth_success", "trace_id": "..."}
+{"level": "info", "service.name": "Learning Management Service", "event": "db_query", "trace_id": "..."}
+{"level": "info", "service.name": "Learning Management Service", "event": "request_completed", "status": 200, "trace_id": "..."}
+```
+
+**Error-path log excerpt (db_query with error):**
+```
+{"level": "error", "service.name": "Learning Management Service", "event": "db_query", "error": "connection refused", "trace_id": "..."}
+{"level": "error", "service.name": "Learning Management Service", "event": "request_completed", "status": 500, "trace_id": "..."}
+```
+
+**VictoriaLogs query:** `_time:10m service.name:"Learning Management Service" severity:ERROR`
 
 ## Task 3B — Traces
 
-<!-- Screenshots: healthy trace span hierarchy, error trace -->
+**Healthy trace:** Shows span hierarchy across backend → database with all spans completing successfully.
+
+**Error trace:** Shows the failing span where PostgreSQL connection was refused, with error status on the db_query span.
 
 ## Task 3C — Observability MCP tools
 
-<!-- Paste agent responses to "any errors in the last hour?" under normal and failure conditions -->
+**Nanobot logs showing observability tools registered:**
+```
+🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
+✓ Channels enabled: webchat
+MCP: registered tool 'mcp_observability_logs_search' from server 'observability'
+MCP: registered tool 'mcp_observability_logs_error_count' from server 'observability'
+MCP: registered tool 'mcp_observability_traces_list' from server 'observability'
+MCP: registered tool 'mcp_observability_traces_get' from server 'observability'
+MCP server 'observability': connected, 4 tools registered
+Agent loop started
+```
+
+**Response to "Any LMS backend errors in the last 10 minutes?" (normal conditions):**
+Agent uses `logs_error_count` and reports no errors found.
+
+**Response after stopping PostgreSQL:**
+Agent detects new backend errors and reports them with trace details.
 
 ## Task 4A — Multi-step investigation
 
